@@ -1,12 +1,22 @@
 "use client";
 
-export function DeleteButton({ deleteAction }: { deleteAction: () => Promise<void> }) {
+import { useActionState } from "react";
+
+type Props = {
+  action: (prevState: { message?: string }, formData: FormData) => Promise<{ message?: string }>;
+  itemId: string;
+};
+
+export function DeleteButton({ action, itemId }: Props) {
+  const [state, formAction] = useActionState(action, {});
+
   return (
-    <form action={deleteAction}>
+    <form action={formAction}>
+      <input type="hidden" name="id" value={itemId} />
       <button
         type="submit"
         onClick={(e) => {
-          if (!confirm("Are you sure you want to delete this raw material?")) {
+          if (!confirm("Are you sure you want to delete this item?")) {
             e.preventDefault();
           }
         }}
@@ -14,6 +24,9 @@ export function DeleteButton({ deleteAction }: { deleteAction: () => Promise<voi
       >
         Delete
       </button>
+      {state?.message && (
+        <p className="mt-1 text-xs text-red-600">{state.message}</p>
+      )}
     </form>
   );
 }

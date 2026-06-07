@@ -104,12 +104,16 @@ export async function updateRawMaterial(
   redirect("/raw-materials");
 }
 
-export async function deleteRawMaterial(id: string) {
+export async function deleteRawMaterial(_prevState: { message?: string }, formData: FormData): Promise<{ message?: string }> {
+  const id = formData.get("id") as string;
+  if (!id) return { message: "Missing item ID" };
+
   const { error } = await supabase.from("raw_materials").delete().eq("id", id);
 
   if (error) {
-    throw new Error(error.message);
+    return { message: error.message };
   }
 
   revalidatePath("/raw-materials");
+  return {};
 }

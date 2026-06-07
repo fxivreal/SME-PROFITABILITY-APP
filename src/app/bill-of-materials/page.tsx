@@ -80,7 +80,7 @@ export default async function BillOfMaterialsPage() {
                       >
                         Edit
                       </Link>
-                      <DeleteButton deleteAction={deleteBOM.bind(null, bom.id)} />
+                      <DeleteButton action={deleteBOM} itemId={bom.id} />
                     </td>
                   </tr>
                 );

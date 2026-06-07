@@ -56,7 +56,7 @@ export default async function BOMDetailPage(props: { params: Promise<{ id: strin
           >
             Edit
           </Link>
-          <DeleteButton deleteAction={deleteBOM.bind(null, id)} />
+          <DeleteButton action={deleteBOM} itemId={id} />
         </div>
       </div>
 

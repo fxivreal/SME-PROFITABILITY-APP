@@ -151,12 +151,17 @@ export async function updateBOM(
   redirect("/bill-of-materials");
 }
 
-export async function deleteBOM(id: string) {
+export async function deleteBOM(_prevState: { message?: string }, formData: FormData): Promise<{ message?: string }> {
+  const id = formData.get("id") as string;
+  if (!id) return { message: "Missing BOM ID" };
+
   const { error } = await supabase.from("bill_of_materials").delete().eq("id", id);
   if (error) {
-    throw new Error(error.message);
+    return { message: error.message };
   }
+
   revalidatePath("/bill-of-materials");
+  return {};
 }
 
 export async function getBOMWithItems(id: string) {

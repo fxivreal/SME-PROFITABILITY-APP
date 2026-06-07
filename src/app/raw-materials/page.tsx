@@ -61,7 +61,7 @@ export default async function RawMaterialsPage() {
                     >
                       Edit
                     </Link>
-                    <DeleteButton deleteAction={deleteRawMaterial.bind(null, item.id)} />
+                    <DeleteButton action={deleteRawMaterial} itemId={item.id} />
                   </td>
                 </tr>
               ))}
