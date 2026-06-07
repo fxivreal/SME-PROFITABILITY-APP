@@ -6,8 +6,9 @@ import { supabase } from "@/lib/supabase";
 
 export type BOMFormState = {
   errors?: {
-    name?: string;
-    finished_good_id?: string;
+    fg_name?: string;
+    fg_unit?: string;
+    fg_selling_price?: string;
     items?: string;
   };
   message?: string;
@@ -17,17 +18,21 @@ export async function createBOM(
   _prevState: BOMFormState,
   formData: FormData,
 ): Promise<BOMFormState> {
-  const name = formData.get("name") as string;
-  const finishedGoodId = formData.get("finished_good_id") as string;
+  const fgName = formData.get("fg_name") as string;
+  const fgUnit = formData.get("fg_unit") as string;
+  const fgSellingPrice = formData.get("fg_selling_price") as string;
   const itemsRaw = formData.get("items") as string;
 
   const errors: BOMFormState["errors"] = {};
 
-  if (!name || !name.trim()) {
-    errors.name = "Name is required";
+  if (!fgName || !fgName.trim()) {
+    errors.fg_name = "Name is required";
   }
-  if (!finishedGoodId) {
-    errors.finished_good_id = "Select a finished good";
+  if (!fgUnit) {
+    errors.fg_unit = "Select a unit";
+  }
+  if (!fgSellingPrice || isNaN(Number(fgSellingPrice)) || Number(fgSellingPrice) < 0) {
+    errors.fg_selling_price = "Must be a non-negative number";
   }
 
   let items: { raw_material_id: string; quantity_required: number }[] = [];
@@ -51,13 +56,28 @@ export async function createBOM(
     }
   }
 
+  const { data: fg, error: fgError } = await supabase
+    .from("finished_goods")
+    .insert({
+      name: fgName.trim(),
+      unit: fgUnit,
+      selling_price: parseFloat(fgSellingPrice),
+    })
+    .select()
+    .single();
+
+  if (fgError || !fg) {
+    return { message: fgError?.message ?? "Failed to create finished good" };
+  }
+
   const { data: bom, error: bomError } = await supabase
     .from("bill_of_materials")
-    .insert({ name: name.trim(), finished_good_id: finishedGoodId })
+    .insert({ name: fgName.trim(), finished_good_id: fg.id })
     .select()
     .single();
 
   if (bomError || !bom) {
+    await supabase.from("finished_goods").delete().eq("id", fg.id);
     return { message: bomError?.message ?? "Failed to create BOM" };
   }
 
@@ -73,6 +93,7 @@ export async function createBOM(
 
   if (itemsError) {
     await supabase.from("bill_of_materials").delete().eq("id", bom.id);
+    await supabase.from("finished_goods").delete().eq("id", fg.id);
     return { message: itemsError.message };
   }
 
@@ -85,18 +106,9 @@ export async function updateBOM(
   _prevState: BOMFormState,
   formData: FormData,
 ): Promise<BOMFormState> {
-  const name = formData.get("name") as string;
-  const finishedGoodId = formData.get("finished_good_id") as string;
   const itemsRaw = formData.get("items") as string;
 
   const errors: BOMFormState["errors"] = {};
-
-  if (!name || !name.trim()) {
-    errors.name = "Name is required";
-  }
-  if (!finishedGoodId) {
-    errors.finished_good_id = "Select a finished good";
-  }
 
   let items: { raw_material_id: string; quantity_required: number }[] = [];
   try {
@@ -117,15 +129,6 @@ export async function updateBOM(
     if (!item.raw_material_id || !item.quantity_required || item.quantity_required <= 0) {
       return { errors: { items: "Each item must have a valid quantity" } };
     }
-  }
-
-  const { error: bomError } = await supabase
-    .from("bill_of_materials")
-    .update({ name: name.trim(), finished_good_id: finishedGoodId })
-    .eq("id", id);
-
-  if (bomError) {
-    return { message: bomError.message };
   }
 
   await supabase.from("bill_of_materials_items").delete().eq("bom_id", id);

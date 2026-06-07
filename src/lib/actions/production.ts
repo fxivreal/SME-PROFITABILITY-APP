@@ -62,6 +62,31 @@ export async function createProductionBatch(
       return { message: "One or more raw materials not found" };
     }
 
+    const rmMap = new Map(rawMaterials.map((r) => [r.id, r]));
+    const shortfalls: string[] = [];
+    let maxBuildQty = Infinity;
+
+    for (const item of items) {
+      const rm = rmMap.get(item.raw_material_id);
+      if (!rm) continue;
+      const required = item.quantity_required * qtyToBuild;
+      const available = Number(rm.quantity_in_stock);
+      if (available < required) {
+        shortfalls.push(`"${rm.name}": need ${required.toFixed(2)} ${rm.unit}, have ${available.toFixed(2)} ${rm.unit}`);
+      }
+      const perUnit = item.quantity_required;
+      const possible = Math.floor(available / perUnit);
+      if (possible < maxBuildQty) {
+        maxBuildQty = possible;
+      }
+    }
+
+    if (shortfalls.length > 0) {
+      return {
+        message: `Insufficient stock. Max build quantity: ${maxBuildQty}. ${shortfalls.join("; ")}`,
+      };
+    }
+
     const batchNumber = await getNextBatchNumber();
     const batch = await insertBatch({
       batch_number: batchNumber,

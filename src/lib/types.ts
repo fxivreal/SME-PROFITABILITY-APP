@@ -52,3 +52,12 @@ export type BillOfMaterialItem = {
   quantity_required: number;
   created_at: string;
 };
+
+export type Sale = {
+  id: string;
+  product_id: string;
+  quantity_sold: number;
+  selling_price: number;
+  sale_date: string;
+  created_at: string;
+};

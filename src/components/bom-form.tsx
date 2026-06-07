@@ -3,16 +3,17 @@
 import { useState, useActionState } from "react";
 import Link from "next/link";
 import type { BOMFormState } from "@/lib/actions/bill-of-materials";
-import type { RawMaterial, FinishedGood } from "@/lib/types";
+import type { RawMaterial } from "@/lib/types";
+
+const units = ["kg", "g", "liters", "ml", "pieces", "meters", "inches", "color"];
 
 type Props = {
   action: (prevState: BOMFormState, formData: FormData) => Promise<BOMFormState>;
-  finishedGoods: Pick<FinishedGood, "id" | "name" | "unit">[];
   rawMaterials: Pick<RawMaterial, "id" | "name" | "unit">[];
   initialData?: {
     id: string;
-    name: string;
-    finished_good_id: string;
+    finished_good_name?: string;
+    finished_good_unit?: string;
     items: { raw_material_id: string; quantity_required: number }[];
   };
 };
@@ -22,7 +23,7 @@ type ItemRow = {
   quantity_required: string;
 };
 
-export function BOMForm({ action, finishedGoods, rawMaterials, initialData }: Props) {
+export function BOMForm({ action, rawMaterials, initialData }: Props) {
   const [state, formAction] = useActionState(action, {});
   const [rows, setRows] = useState<ItemRow[]>(
     initialData
@@ -53,42 +54,62 @@ export function BOMForm({ action, finishedGoods, rawMaterials, initialData }: Pr
 
   return (
     <form action={formAction} className="mt-6 max-w-lg space-y-6">
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          BOM Name
-        </label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          defaultValue={initialData?.name}
-          placeholder="e.g. Standard Recipe A"
-          className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-        />
-        {state.errors?.name && (
-          <p className="mt-1 text-sm text-red-600">{state.errors.name}</p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="finished_good_id" className="block text-sm font-medium text-gray-700">
+      <div className="space-y-4">
+        <label className="block text-sm font-medium text-gray-700">
           Finished Good
         </label>
-        <select
-          id="finished_good_id"
-          name="finished_good_id"
-          defaultValue={initialData?.finished_good_id ?? ""}
-          className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
-        >
-          <option value="" disabled>Select finished good</option>
-          {finishedGoods.map((fg) => (
-            <option key={fg.id} value={fg.id}>
-              {fg.name} ({fg.unit})
-            </option>
-          ))}
-        </select>
-        {state.errors?.finished_good_id && (
-          <p className="mt-1 text-sm text-red-600">{state.errors.finished_good_id}</p>
+        {initialData ? (
+          <p className="text-sm text-gray-700">
+            {initialData.finished_good_name} ({initialData.finished_good_unit})
+          </p>
+        ) : (
+          <>
+            <div>
+              <label htmlFor="fg_name" className="block text-xs text-gray-500 mb-1">Name</label>
+              <input
+                id="fg_name"
+                name="fg_name"
+                type="text"
+                placeholder="e.g. Chocolate Bar"
+                className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
+              />
+              {state.errors?.fg_name && (
+                <p className="mt-1 text-sm text-red-600">{state.errors.fg_name}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="fg_unit" className="block text-xs text-gray-500 mb-1">Unit</label>
+              <select
+                id="fg_unit"
+                name="fg_unit"
+                defaultValue=""
+                className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
+              >
+                <option value="" disabled>Select unit</option>
+                {units.map((u) => (
+                  <option key={u} value={u}>{u}</option>
+                ))}
+              </select>
+              {state.errors?.fg_unit && (
+                <p className="mt-1 text-sm text-red-600">{state.errors.fg_unit}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="fg_selling_price" className="block text-xs text-gray-500 mb-1">Selling Price</label>
+              <input
+                id="fg_selling_price"
+                name="fg_selling_price"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="e.g. 500"
+                className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
+              />
+              {state.errors?.fg_selling_price && (
+                <p className="mt-1 text-sm text-red-600">{state.errors.fg_selling_price}</p>
+              )}
+            </div>
+          </>
         )}
       </div>
 
