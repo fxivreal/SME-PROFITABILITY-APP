@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { label: "Dashboard", href: "/" },
   { label: "Raw Materials", href: "/raw-materials" },
+  { label: "Bill of Materials", href: "/bill-of-materials" },
   { label: "Production", href: "/production" },
+  { label: "Build History", href: "/build-history" },
   { label: "Finished Goods", href: "/finished-goods" },
   { label: "Sales", href: "/sales" },
 ];
