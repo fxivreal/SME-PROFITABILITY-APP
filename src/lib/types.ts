@@ -39,7 +39,7 @@ export type ProductionBatch = {
 export type BatchMaterial = {
   id: string;
   batch_id: string;
-  raw_material_id: string;
+  raw_material_id: string | null;
   quantity_used: number;
   company_id: string;
 };
