@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase";
+import { PaginatedTable } from "@/components/paginated-table";
 import type { Sale } from "@/lib/types";
 
 export default async function SalesPage() {
@@ -28,41 +29,32 @@ export default async function SalesPage() {
         </Link>
       </div>
 
-      {items.length === 0 ? (
-        <p className="mt-8 text-gray-400 text-center">No sales recorded yet.</p>
-      ) : (
-        <div className="mt-6 overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr className="text-left text-sm font-medium text-gray-500">
-                <th className="py-3 pr-3 sm:pr-6">Date</th>
-                <th className="py-3 pr-3 sm:pr-6">Product</th>
-                <th className="py-3 pr-3 sm:pr-6">Quantity Sold</th>
-                <th className="py-3 pr-3 sm:pr-6">Selling Price</th>
-                <th className="py-3">Revenue</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
-              {items.map((sale) => {
-                const revenue = sale.quantity_sold * sale.selling_price;
-                return (
-                  <tr key={sale.id}>
-                    <td className="py-3 pr-3 sm:pr-6">{sale.sale_date}</td>
-                    <td className="py-3 pr-3 sm:pr-6 font-medium text-gray-900">{sale.finished_goods.name}</td>
-                    <td className="py-3 pr-3 sm:pr-6">{Number(sale.quantity_sold).toFixed(2)}</td>
-                    <td className="py-3 pr-3 sm:pr-6">
-                      ₦{Number(sale.selling_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </td>
-                    <td className="py-3 font-medium text-gray-900">
-                      ₦{revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+      <PaginatedTable items={items} keyExtractor={(i) => i.id} renderRow={(sale) => {
+        const revenue = sale.quantity_sold * sale.selling_price;
+        return (
+          <>
+            <td className="py-3 pr-3 sm:pr-6">{sale.sale_date}</td>
+            <td className="py-3 pr-3 sm:pr-6 font-medium text-gray-900">{sale.finished_goods.name}</td>
+            <td className="py-3 pr-3 sm:pr-6">{Number(sale.quantity_sold).toFixed(2)}</td>
+            <td className="py-3 pr-3 sm:pr-6">
+              ₦{Number(sale.selling_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </td>
+            <td className="py-3 font-medium text-gray-900">
+              ₦{revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </td>
+          </>
+        );
+      }} emptyMessage="No sales recorded yet.">
+        <thead>
+          <tr className="text-left text-sm font-medium text-gray-500">
+            <th className="py-3 pr-3 sm:pr-6">Date</th>
+            <th className="py-3 pr-3 sm:pr-6">Product</th>
+            <th className="py-3 pr-3 sm:pr-6">Quantity Sold</th>
+            <th className="py-3 pr-3 sm:pr-6">Selling Price</th>
+            <th className="py-3">Revenue</th>
+          </tr>
+        </thead>
+      </PaginatedTable>
     </div>
   );
 }
