@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient, getCompanyId } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export type RawMaterialFormState = {
   errors?: {
@@ -43,9 +43,7 @@ export async function createRawMaterial(
   }
 
   const supabase = await createClient();
-  const company_id = await getCompanyId();
   const { error } = await supabase.from("raw_materials").insert({
-    company_id,
     name: name.trim(),
     unit: unit.trim(),
     quantity_in_stock: parseFloat(quantityInStock),
