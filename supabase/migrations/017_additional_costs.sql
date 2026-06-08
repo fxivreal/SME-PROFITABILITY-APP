@@ -32,7 +32,7 @@ BEGIN
     FROM batch_materials bm
     LEFT JOIN raw_materials rm ON rm.id = bm.raw_material_id
     WHERE bm.batch_id = p_batch_id
-    FOR UPDATE OF rm
+
   LOOP
     IF v_rm.rm_id IS NULL THEN
       CONTINUE;

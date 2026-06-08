@@ -17,15 +17,24 @@ export type BatchFilters = {
 
 export async function getNextBatchNumber(): Promise<string> {
   const supabase = await createClient();
-  const { count, error } = await supabase
+  const { data, error } = await supabase
     .from("production_batches")
-    .select("*", { count: "exact", head: true });
+    .select("batch_number")
+    .order("batch_number", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   if (error) {
     throw new Error("Failed to generate batch number");
   }
 
-  return `BATCH-${String((count ?? 0) + 1).padStart(3, "0")}`;
+  if (!data) {
+    return "BATCH-001";
+  }
+
+  const last = parseInt(data.batch_number.replace("BATCH-", ""), 10);
+  const next = isNaN(last) ? 1 : last + 1;
+  return `BATCH-${String(next).padStart(3, "0")}`;
 }
 
 export async function insertBatch(data: CreateBatchData) {
