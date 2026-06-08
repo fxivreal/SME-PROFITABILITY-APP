@@ -7,10 +7,10 @@ export default async function NewBOMPage() {
   const supabase = await createClient();
   const { data: rawMaterials } = await supabase
     .from("raw_materials")
-    .select("id, name, unit")
+    .select("id, name, unit, cost_per_unit")
     .order("name");
 
-  const items = (rawMaterials ?? []) as Pick<RawMaterial, "id" | "name" | "unit">[];
+  const items = (rawMaterials ?? []) as Pick<RawMaterial, "id" | "name" | "unit" | "cost_per_unit">[];
 
   return (
     <div>

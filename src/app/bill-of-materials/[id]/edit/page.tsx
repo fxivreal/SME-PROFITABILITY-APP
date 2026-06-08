@@ -10,7 +10,7 @@ export default async function EditBOMPage(props: { params: Promise<{ id: string 
   const supabase = await createClient();
   const [bomResult, rmResult] = await Promise.all([
     supabase.from("bill_of_materials").select("*, bill_of_materials_items(*)").eq("id", id).single(),
-    supabase.from("raw_materials").select("id, name, unit").order("name"),
+    supabase.from("raw_materials").select("id, name, unit, cost_per_unit").order("name"),
   ]);
 
   if (bomResult.error || !bomResult.data) {
@@ -27,11 +27,11 @@ export default async function EditBOMPage(props: { params: Promise<{ id: string 
 
   const { data: fg } = await supabase
     .from("finished_goods")
-    .select("name, unit")
+    .select("name, unit, selling_price")
     .eq("id", bom.finished_good_id)
     .single();
 
-  const rawMaterials = (rmResult.data ?? []) as Pick<RawMaterial, "id" | "name" | "unit">[];
+  const rawMaterials = (rmResult.data ?? []) as Pick<RawMaterial, "id" | "name" | "unit" | "cost_per_unit">[];
 
   const updateWithId = updateBOM.bind(null, id);
 
@@ -46,6 +46,7 @@ export default async function EditBOMPage(props: { params: Promise<{ id: string 
           id: bom.id,
           finished_good_name: fg?.name ?? "Unknown",
           finished_good_unit: fg?.unit ?? "",
+          selling_price: fg?.selling_price ?? 0,
           items: bom.bill_of_materials_items,
         }}
       />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useActionState } from "react";
+import { useState, useActionState, useMemo } from "react";
 import Link from "next/link";
 import type { BOMFormState } from "@/lib/actions/bill-of-materials";
 import type { RawMaterial } from "@/lib/types";
@@ -9,11 +9,12 @@ const units = ["kg", "g", "liters", "ml", "pieces", "meters", "inches", "color"]
 
 type Props = {
   action: (prevState: BOMFormState, formData: FormData) => Promise<BOMFormState>;
-  rawMaterials: Pick<RawMaterial, "id" | "name" | "unit">[];
+  rawMaterials: Pick<RawMaterial, "id" | "name" | "unit" | "cost_per_unit">[];
   initialData?: {
     id: string;
     finished_good_name?: string;
     finished_good_unit?: string;
+    selling_price?: number;
     items: { raw_material_id: string; quantity_required: number }[];
   };
 };
@@ -22,6 +23,10 @@ type ItemRow = {
   raw_material_id: string;
   quantity_required: string;
 };
+
+function naira(value: number) {
+  return `₦${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
 
 export function BOMForm({ action, rawMaterials, initialData }: Props) {
   const [state, formAction] = useActionState(action, {});
@@ -33,6 +38,27 @@ export function BOMForm({ action, rawMaterials, initialData }: Props) {
         }))
       : [{ raw_material_id: "", quantity_required: "" }],
   );
+  const [sellingPrice, setSellingPrice] = useState(initialData?.selling_price?.toString() ?? "");
+
+  const rmMap = useMemo(
+    () => new Map(rawMaterials.map((rm) => [rm.id, rm])),
+    [rawMaterials],
+  );
+
+  const materialCost = useMemo(() => {
+    let total = 0;
+    for (const row of rows) {
+      if (!row.raw_material_id || !row.quantity_required) continue;
+      const rm = rmMap.get(row.raw_material_id);
+      if (!rm) continue;
+      total += parseFloat(row.quantity_required) * Number(rm.cost_per_unit);
+    }
+    return total;
+  }, [rows, rmMap]);
+
+  const price = parseFloat(sellingPrice) || 0;
+  const margin = price - materialCost;
+  const marginPercent = price > 0 ? (margin / price) * 100 : 0;
 
   function addRow() {
     setRows((prev) => [...prev, { raw_material_id: "", quantity_required: "" }]);
@@ -103,6 +129,8 @@ export function BOMForm({ action, rawMaterials, initialData }: Props) {
                 step="0.01"
                 min="0"
                 placeholder="e.g. 500"
+                value={sellingPrice}
+                onChange={(e) => setSellingPrice(e.target.value)}
                 className="mt-1 block w-full rounded border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none"
               />
               {state.errors?.fg_selling_price && (
@@ -178,6 +206,31 @@ export function BOMForm({ action, rawMaterials, initialData }: Props) {
         {state.errors?.items && (
           <p className="mt-1 text-sm text-red-600">{state.errors.items}</p>
         )}
+      </div>
+
+      <div className="rounded border border-gray-200 bg-gray-50 p-4 space-y-2">
+        <h4 className="text-sm font-semibold text-gray-700">Cost Summary (per unit)</h4>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Material Cost</span>
+          <span className="font-medium">{naira(materialCost)}</span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Selling Price</span>
+          <span className="font-medium">{price > 0 ? naira(price) : "—"}</span>
+        </div>
+        <hr className="border-gray-300" />
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Margin</span>
+          <span className={`font-semibold ${margin >= 0 ? "text-green-600" : "text-red-600"}`}>
+            {price > 0 ? naira(margin) : "—"}
+          </span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray-600">Margin %</span>
+          <span className={`font-semibold ${margin >= 0 ? "text-green-600" : "text-red-600"}`}>
+            {price > 0 ? `${marginPercent.toFixed(1)}%` : "—"}
+          </span>
+        </div>
       </div>
 
       {state.message && (
