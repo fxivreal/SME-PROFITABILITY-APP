@@ -88,7 +88,14 @@ export async function completeBuildViaRPC(batchId: string) {
     throw new Error(error.message);
   }
 
-  const result = data as { success: boolean; error?: string; total_material_cost?: number; cost_per_unit?: number };
+  const result = data as {
+    success: boolean;
+    error?: string;
+    total_material_cost?: number;
+    total_additional_cost?: number;
+    total_cost?: number;
+    cost_per_unit?: number;
+  };
 
   if (!result.success) {
     throw new Error(result.error ?? "Failed to complete build");

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase";
 import { getBOMWithItems } from "@/lib/services/bom";
 import { getRawMaterials } from "@/lib/services/raw-materials";
 import {
@@ -115,12 +116,37 @@ export async function createProductionBatch(
   redirect("/production");
 }
 
-export async function completeBatch(batchId: string) {
+export async function completeBatch(
+  batchId: string,
+  additionalCosts: { description: string; amount: number }[] = [],
+) {
   try {
+    const supabase = await createClient();
+    const totalAdditional = additionalCosts.reduce((sum, c) => sum + c.amount, 0);
+
+    const { error: updateError } = await supabase
+      .from("production_batches")
+      .update({
+        additional_costs: additionalCosts,
+        total_additional_cost: totalAdditional,
+      })
+      .eq("id", batchId);
+
+    if (updateError) {
+      throw new Error(updateError.message);
+    }
+
     const result = await completeBuildViaRPC(batchId);
+
     revalidatePath("/production");
     revalidatePath("/build-history");
-    return { success: true as const, total_material_cost: result.total_material_cost, cost_per_unit: result.cost_per_unit };
+    return {
+      success: true as const,
+      total_material_cost: result.total_material_cost,
+      total_additional_cost: result.total_additional_cost,
+      total_cost: result.total_cost,
+      cost_per_unit: result.cost_per_unit,
+    };
   } catch (err) {
     return {
       success: false as const,

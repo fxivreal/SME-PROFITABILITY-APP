@@ -1,7 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { completeBatch } from "@/lib/actions/production";
+import { CompleteBatchModal } from "./complete-batch-modal";
 
 type Props = {
   batchId: string;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function BatchActions({ batchId, status }: Props) {
+  const [showModal, setShowModal] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   if (status === "completed") {
@@ -17,19 +19,35 @@ export function BatchActions({ batchId, status }: Props) {
     );
   }
 
+  async function handleComplete(
+    costs: { description: string; amount: number }[],
+  ) {
+    startTransition(async () => {
+      const result = await completeBatch(batchId, costs);
+      if (!result.success) {
+        alert(result.error);
+      }
+      setShowModal(false);
+    });
+  }
+
   return (
-    <button
-      type="button"
-      disabled={isPending}
-      onClick={() => startTransition(async () => {
-        const result = await completeBatch(batchId);
-        if (!result.success) {
-          alert(result.error);
-        }
-      })}
-      className="rounded bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
-    >
-      {isPending ? "Completing..." : "Complete"}
-    </button>
+    <>
+      <button
+        type="button"
+        onClick={() => setShowModal(true)}
+        disabled={isPending}
+        className="rounded bg-green-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-green-700 disabled:opacity-50"
+      >
+        {isPending ? "Completing..." : "Complete"}
+      </button>
+
+      {showModal && (
+        <CompleteBatchModal
+          onClose={() => setShowModal(false)}
+          onComplete={handleComplete}
+        />
+      )}
+    </>
   );
 }

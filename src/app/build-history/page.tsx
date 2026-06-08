@@ -66,7 +66,9 @@ export default async function BuildHistoryPage(props: {
                 <th className="py-3 pr-3 sm:pr-6">Batch</th>
                 <th className="py-3 pr-3 sm:pr-6">Product</th>
                 <th className="py-3 pr-3 sm:pr-6">Qty Built</th>
-                <th className="py-3 pr-3 sm:pr-6">Total Build Cost</th>
+                <th className="py-3 pr-3 sm:pr-6">Material Cost</th>
+                <th className="py-3 pr-3 sm:pr-6">Add. Cost</th>
+                <th className="py-3 pr-3 sm:pr-6">Total Cost</th>
                 <th className="py-3 pr-3 sm:pr-6">Cost / Unit</th>
                 <th className="py-3 pr-3 sm:pr-6">Production Date</th>
                 <th className="py-3">Status</th>
@@ -81,6 +83,16 @@ export default async function BuildHistoryPage(props: {
                   <td className="py-3 pr-3 sm:pr-6">
                     {batch.total_material_cost
                       ? `₦${Number(batch.total_material_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                      : "—"}
+                  </td>
+                  <td className="py-3 pr-3 sm:pr-6">
+                    {batch.total_additional_cost
+                      ? `₦${Number(batch.total_additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                      : "—"}
+                  </td>
+                  <td className="py-3 pr-3 sm:pr-6">
+                    {batch.total_material_cost || batch.total_additional_cost
+                      ? `₦${(Number(batch.total_material_cost || 0) + Number(batch.total_additional_cost || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                       : "—"}
                   </td>
                   <td className="py-3 pr-3 sm:pr-6">

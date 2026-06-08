@@ -28,7 +28,10 @@ export type ProductionBatch = {
   finished_good_id: string;
   quantity_to_build: number;
   total_material_cost: number;
+  total_additional_cost: number;
+  total_cost: number;
   cost_per_unit: number;
+  additional_costs: { description: string; amount: number }[];
   status: "pending" | "completed";
   bom_id: string | null;
   created_at: string;

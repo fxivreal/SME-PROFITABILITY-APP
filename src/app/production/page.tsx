@@ -56,6 +56,7 @@ export default async function ProductionPage() {
                 <th className="py-3 pr-3 sm:pr-6">BOM</th>
                 <th className="py-3 pr-3 sm:pr-6">Qty To Build</th>
                 <th className="py-3 pr-3 sm:pr-6">Material Cost</th>
+                <th className="py-3 pr-3 sm:pr-6">Add. Cost</th>
                 <th className="py-3 pr-3 sm:pr-6">Cost / Unit</th>
                 <th className="py-3 pr-3 sm:pr-6">Status</th>
                 <th className="py-3">Actions</th>
@@ -74,6 +75,11 @@ export default async function ProductionPage() {
                   <td className="py-3 pr-3 sm:pr-6">
                     {batch.total_material_cost
                       ? `₦${Number(batch.total_material_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                      : "—"}
+                  </td>
+                  <td className="py-3 pr-3 sm:pr-6">
+                    {batch.total_additional_cost
+                      ? `₦${Number(batch.total_additional_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                       : "—"}
                   </td>
                   <td className="py-3 pr-3 sm:pr-6">
