@@ -1,7 +1,8 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import type { FinishedGood } from "@/lib/types";
 
 export default async function FinishedGoodsPage() {
+  const supabase = await createClient();
   const { data: finishedGoods } = await supabase
     .from("finished_goods")
     .select("*")
@@ -25,11 +26,11 @@ export default async function FinishedGoodsPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr className="text-left text-sm font-medium text-gray-500">
-                <th className="py-3 pr-6">Name</th>
-                <th className="py-3 pr-6">Unit</th>
-                <th className="py-3 pr-6">Quantity in Stock</th>
-                <th className="py-3 pr-6">Cost per Unit</th>
-                <th className="py-3 pr-6">Selling Price</th>
+                <th className="py-3 pr-3 sm:pr-6">Name</th>
+                <th className="py-3 pr-3 sm:pr-6">Unit</th>
+                <th className="py-3 pr-3 sm:pr-6">Quantity in Stock</th>
+                <th className="py-3 pr-3 sm:pr-6">Cost per Unit</th>
+                <th className="py-3 pr-3 sm:pr-6">Selling Price</th>
                 <th className="py-3">Total Value</th>
               </tr>
             </thead>
@@ -38,13 +39,13 @@ export default async function FinishedGoodsPage() {
                 const totalValue = item.quantity_in_stock * item.selling_price;
                 return (
                   <tr key={item.id}>
-                    <td className="py-3 pr-6 font-medium text-gray-900">{item.name}</td>
-                    <td className="py-3 pr-6">{item.unit}</td>
-                    <td className="py-3 pr-6">{Number(item.quantity_in_stock).toFixed(2)}</td>
-                    <td className="py-3 pr-6">
+                    <td className="py-3 pr-3 sm:pr-6 font-medium text-gray-900">{item.name}</td>
+                    <td className="py-3 pr-3 sm:pr-6">{item.unit}</td>
+                    <td className="py-3 pr-3 sm:pr-6">{Number(item.quantity_in_stock).toFixed(2)}</td>
+                    <td className="py-3 pr-3 sm:pr-6">
                       ₦{Number(item.cost_per_unit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
-                    <td className="py-3 pr-6">
+                    <td className="py-3 pr-3 sm:pr-6">
                       ₦{Number(item.selling_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="py-3 font-medium text-gray-900">

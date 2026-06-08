@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import type { Sale } from "@/lib/types";
 
 export default async function SalesPage() {
+  const supabase = await createClient();
   const { data: sales } = await supabase
     .from("sales")
     .select("*, finished_goods!product_id(name)")
@@ -34,10 +35,10 @@ export default async function SalesPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr className="text-left text-sm font-medium text-gray-500">
-                <th className="py-3 pr-6">Date</th>
-                <th className="py-3 pr-6">Product</th>
-                <th className="py-3 pr-6">Quantity Sold</th>
-                <th className="py-3 pr-6">Selling Price</th>
+                <th className="py-3 pr-3 sm:pr-6">Date</th>
+                <th className="py-3 pr-3 sm:pr-6">Product</th>
+                <th className="py-3 pr-3 sm:pr-6">Quantity Sold</th>
+                <th className="py-3 pr-3 sm:pr-6">Selling Price</th>
                 <th className="py-3">Revenue</th>
               </tr>
             </thead>
@@ -46,10 +47,10 @@ export default async function SalesPage() {
                 const revenue = sale.quantity_sold * sale.selling_price;
                 return (
                   <tr key={sale.id}>
-                    <td className="py-3 pr-6">{sale.sale_date}</td>
-                    <td className="py-3 pr-6 font-medium text-gray-900">{sale.finished_goods.name}</td>
-                    <td className="py-3 pr-6">{Number(sale.quantity_sold).toFixed(2)}</td>
-                    <td className="py-3 pr-6">
+                    <td className="py-3 pr-3 sm:pr-6">{sale.sale_date}</td>
+                    <td className="py-3 pr-3 sm:pr-6 font-medium text-gray-900">{sale.finished_goods.name}</td>
+                    <td className="py-3 pr-3 sm:pr-6">{Number(sale.quantity_sold).toFixed(2)}</td>
+                    <td className="py-3 pr-3 sm:pr-6">
                       ₦{Number(sale.selling_price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="py-3 font-medium text-gray-900">

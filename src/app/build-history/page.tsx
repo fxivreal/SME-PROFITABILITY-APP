@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { BuildHistoryFilters } from "@/components/build-history-filters";
 import type { ProductionBatch, FinishedGood, BillOfMaterial } from "@/lib/types";
 
@@ -14,6 +14,7 @@ export default async function BuildHistoryPage(props: {
 }) {
   const sp = await props.searchParams;
 
+  const supabase = await createClient();
   let query = supabase
     .from("production_batches")
     .select("*, finished_goods!finished_good_id(id, name), bill_of_materials!bom_id(id, name)")
@@ -62,32 +63,32 @@ export default async function BuildHistoryPage(props: {
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr className="text-left text-sm font-medium text-gray-500">
-                <th className="py-3 pr-6">Batch</th>
-                <th className="py-3 pr-6">Product</th>
-                <th className="py-3 pr-6">Qty Built</th>
-                <th className="py-3 pr-6">Total Build Cost</th>
-                <th className="py-3 pr-6">Cost / Unit</th>
-                <th className="py-3 pr-6">Production Date</th>
+                <th className="py-3 pr-3 sm:pr-6">Batch</th>
+                <th className="py-3 pr-3 sm:pr-6">Product</th>
+                <th className="py-3 pr-3 sm:pr-6">Qty Built</th>
+                <th className="py-3 pr-3 sm:pr-6">Total Build Cost</th>
+                <th className="py-3 pr-3 sm:pr-6">Cost / Unit</th>
+                <th className="py-3 pr-3 sm:pr-6">Production Date</th>
                 <th className="py-3">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
               {items.map((batch) => (
                 <tr key={batch.id}>
-                  <td className="py-3 pr-6 font-medium text-gray-900">{batch.batch_number}</td>
-                  <td className="py-3 pr-6">{batch.finished_goods?.name ?? "—"}</td>
-                  <td className="py-3 pr-6">{Number(batch.quantity_to_build).toFixed(2)}</td>
-                  <td className="py-3 pr-6">
+                  <td className="py-3 pr-3 sm:pr-6 font-medium text-gray-900">{batch.batch_number}</td>
+                  <td className="py-3 pr-3 sm:pr-6">{batch.finished_goods?.name ?? "—"}</td>
+                  <td className="py-3 pr-3 sm:pr-6">{Number(batch.quantity_to_build).toFixed(2)}</td>
+                  <td className="py-3 pr-3 sm:pr-6">
                     {batch.total_material_cost
                       ? `₦${Number(batch.total_material_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                       : "—"}
                   </td>
-                  <td className="py-3 pr-6">
+                  <td className="py-3 pr-3 sm:pr-6">
                     {batch.cost_per_unit
                       ? `₦${Number(batch.cost_per_unit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                       : "—"}
                   </td>
-                  <td className="py-3 pr-6">{batch.production_date}</td>
+                  <td className="py-3 pr-3 sm:pr-6">{batch.production_date}</td>
                   <td className="py-3">
                     <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${
                       batch.status === "completed"

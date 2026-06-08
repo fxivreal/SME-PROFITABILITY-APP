@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export type BOMFormState = {
   errors?: {
@@ -56,6 +56,7 @@ export async function createBOM(
     }
   }
 
+  const supabase = await createClient();
   const { data: fg, error: fgError } = await supabase
     .from("finished_goods")
     .insert({
@@ -131,6 +132,7 @@ export async function updateBOM(
     }
   }
 
+  const supabase = await createClient();
   await supabase.from("bill_of_materials_items").delete().eq("bom_id", id);
 
   const bomItems = items.map((item) => ({
@@ -155,6 +157,7 @@ export async function deleteBOM(_prevState: { message?: string }, formData: Form
   const id = formData.get("id") as string;
   if (!id) return { message: "Missing BOM ID" };
 
+  const supabase = await createClient();
   const { error } = await supabase.from("bill_of_materials").delete().eq("id", id);
   if (error) {
     return { message: error.message };
@@ -165,6 +168,7 @@ export async function deleteBOM(_prevState: { message?: string }, formData: Form
 }
 
 export async function getBOMWithItems(id: string) {
+  const supabase = await createClient();
   const { data: bom } = await supabase
     .from("bill_of_materials")
     .select("*, bill_of_materials_items(*)")

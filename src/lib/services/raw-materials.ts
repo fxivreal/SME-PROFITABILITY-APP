@@ -1,6 +1,7 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export async function getRawMaterials(ids?: string[]) {
+  const supabase = await createClient();
   let query = supabase.from("raw_materials").select("id, name, unit, quantity_in_stock, cost_per_unit");
   if (ids && ids.length > 0) {
     query = query.in("id", ids);
@@ -11,6 +12,7 @@ export async function getRawMaterials(ids?: string[]) {
 }
 
 export async function deductStock(id: string, quantity: number) {
+  const supabase = await createClient();
   const { error } = await supabase
     .from("raw_materials")
     .update({ quantity_in_stock: quantity })

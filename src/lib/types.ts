@@ -5,6 +5,8 @@ export type RawMaterial = {
   quantity_in_stock: number;
   cost_per_unit: number;
   created_at: string;
+  company_id: string;
+  created_by: string;
 };
 
 export type FinishedGood = {
@@ -15,6 +17,8 @@ export type FinishedGood = {
   quantity_in_stock: number;
   cost_per_unit: number;
   created_at: string;
+  company_id: string;
+  created_by: string;
 };
 
 export type ProductionBatch = {
@@ -28,6 +32,8 @@ export type ProductionBatch = {
   status: "pending" | "completed";
   bom_id: string | null;
   created_at: string;
+  company_id: string;
+  created_by: string;
 };
 
 export type BatchMaterial = {
@@ -35,6 +41,7 @@ export type BatchMaterial = {
   batch_id: string;
   raw_material_id: string;
   quantity_used: number;
+  company_id: string;
 };
 
 export type BillOfMaterial = {
@@ -43,6 +50,8 @@ export type BillOfMaterial = {
   name: string;
   is_active: boolean;
   created_at: string;
+  company_id: string;
+  created_by: string;
 };
 
 export type BillOfMaterialItem = {
@@ -51,6 +60,7 @@ export type BillOfMaterialItem = {
   raw_material_id: string;
   quantity_required: number;
   created_at: string;
+  company_id: string;
 };
 
 export type Sale = {
@@ -59,5 +69,21 @@ export type Sale = {
   quantity_sold: number;
   selling_price: number;
   sale_date: string;
+  created_at: string;
+  company_id: string;
+  created_by: string;
+};
+
+export type Company = {
+  id: string;
+  name: string;
+  created_at: string;
+  created_by: string | null;
+};
+
+export type Profile = {
+  id: string;
+  company_id: string;
+  role: string;
   created_at: string;
 };

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export type RawMaterialFormState = {
   errors?: {
@@ -42,6 +42,7 @@ export async function createRawMaterial(
     return { errors };
   }
 
+  const supabase = await createClient();
   const { error } = await supabase.from("raw_materials").insert({
     name: name.trim(),
     unit: unit.trim(),
@@ -86,6 +87,7 @@ export async function updateRawMaterial(
     return { errors };
   }
 
+  const supabase = await createClient();
   const { error } = await supabase
     .from("raw_materials")
     .update({
@@ -108,6 +110,7 @@ export async function deleteRawMaterial(_prevState: { message?: string }, formDa
   const id = formData.get("id") as string;
   if (!id) return { message: "Missing item ID" };
 
+  const supabase = await createClient();
   const { error } = await supabase.from("raw_materials").delete().eq("id", id);
 
   if (error) {

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { updateBOM } from "@/lib/actions/bill-of-materials";
 import { BOMForm } from "@/components/bom-form";
 import type { RawMaterial } from "@/lib/types";
@@ -7,6 +7,7 @@ import type { RawMaterial } from "@/lib/types";
 export default async function EditBOMPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
 
+  const supabase = await createClient();
   const [bomResult, rmResult] = await Promise.all([
     supabase.from("bill_of_materials").select("*, bill_of_materials_items(*)").eq("id", id).single(),
     supabase.from("raw_materials").select("id, name, unit").order("name"),

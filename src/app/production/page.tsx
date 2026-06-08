@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { BatchActions } from "@/components/batch-actions";
 import type { ProductionBatch, FinishedGood } from "@/lib/types";
 
@@ -9,6 +9,7 @@ const statusStyles: Record<string, string> = {
 };
 
 export default async function ProductionPage() {
+  const supabase = await createClient();
   const { data: batches } = await supabase
     .from("production_batches")
     .select("*")
@@ -49,38 +50,38 @@ export default async function ProductionPage() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr className="text-left text-sm font-medium text-gray-500">
-                <th className="py-3 pr-6">Batch</th>
-                <th className="py-3 pr-6">Date</th>
-                <th className="py-3 pr-6">Product</th>
-                <th className="py-3 pr-6">BOM</th>
-                <th className="py-3 pr-6">Qty To Build</th>
-                <th className="py-3 pr-6">Material Cost</th>
-                <th className="py-3 pr-6">Cost / Unit</th>
-                <th className="py-3 pr-6">Status</th>
+                <th className="py-3 pr-3 sm:pr-6">Batch</th>
+                <th className="py-3 pr-3 sm:pr-6">Date</th>
+                <th className="py-3 pr-3 sm:pr-6">Product</th>
+                <th className="py-3 pr-3 sm:pr-6">BOM</th>
+                <th className="py-3 pr-3 sm:pr-6">Qty To Build</th>
+                <th className="py-3 pr-3 sm:pr-6">Material Cost</th>
+                <th className="py-3 pr-3 sm:pr-6">Cost / Unit</th>
+                <th className="py-3 pr-3 sm:pr-6">Status</th>
                 <th className="py-3">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
               {items.map((batch) => (
                 <tr key={batch.id}>
-                  <td className="py-3 pr-6 font-medium text-gray-900">{batch.batch_number}</td>
-                  <td className="py-3 pr-6">{batch.production_date}</td>
-                  <td className="py-3 pr-6">{fgMap.get(batch.finished_good_id) ?? "—"}</td>
-                  <td className="py-3 pr-6 text-gray-400">
+                  <td className="py-3 pr-3 sm:pr-6 font-medium text-gray-900">{batch.batch_number}</td>
+                  <td className="py-3 pr-3 sm:pr-6">{batch.production_date}</td>
+                  <td className="py-3 pr-3 sm:pr-6">{fgMap.get(batch.finished_good_id) ?? "—"}</td>
+                  <td className="py-3 pr-3 sm:pr-6 text-gray-400">
                     {batch.bom_id ? (bomMap.get(batch.bom_id) ?? "—") : "—"}
                   </td>
-                  <td className="py-3 pr-6">{Number(batch.quantity_to_build).toFixed(2)}</td>
-                  <td className="py-3 pr-6">
+                  <td className="py-3 pr-3 sm:pr-6">{Number(batch.quantity_to_build).toFixed(2)}</td>
+                  <td className="py-3 pr-3 sm:pr-6">
                     {batch.total_material_cost
                       ? `₦${Number(batch.total_material_cost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                       : "—"}
                   </td>
-                  <td className="py-3 pr-6">
+                  <td className="py-3 pr-3 sm:pr-6">
                     {batch.cost_per_unit
                       ? `₦${Number(batch.cost_per_unit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                       : "—"}
                   </td>
-                  <td className="py-3 pr-6">
+                  <td className="py-3 pr-3 sm:pr-6">
                     <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${statusStyles[batch.status] ?? "bg-gray-100 text-gray-500"}`}>
                       {batch.status}
                     </span>

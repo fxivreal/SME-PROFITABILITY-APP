@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export type StockValidationResult = {
   valid: boolean;
@@ -8,6 +8,7 @@ export type StockValidationResult = {
 export async function validateStock(
   materials: { raw_material_id: string; quantity_used: number }[],
 ): Promise<StockValidationResult> {
+  const supabase = await createClient();
   const ids = materials.map((m) => m.raw_material_id);
   const { data: rawMaterials, error } = await supabase
     .from("raw_materials")

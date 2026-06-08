@@ -1,9 +1,10 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { createProductionBatch } from "@/lib/actions/production";
 import { BatchForm } from "@/components/batch-form";
 import type { RawMaterial, BillOfMaterial, BillOfMaterialItem } from "@/lib/types";
 
 export default async function NewProductionBatchPage() {
+  const supabase = await createClient();
   const [bomResult, rmResult] = await Promise.all([
     supabase
       .from("bill_of_materials")

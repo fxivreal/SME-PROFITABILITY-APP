@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export type RecordSaleData = {
   product_id: string;
@@ -8,6 +8,7 @@ export type RecordSaleData = {
 };
 
 export async function recordSale(data: RecordSaleData) {
+  const supabase = await createClient();
   const { data: product, error: fetchError } = await supabase
     .from("finished_goods")
     .select("id, quantity_in_stock")
@@ -52,6 +53,7 @@ export type SaleFilters = {
 };
 
 export async function getSales(filters?: SaleFilters) {
+  const supabase = await createClient();
   let query = supabase
     .from("sales")
     .select("*, finished_goods!product_id(name)")

@@ -1,6 +1,7 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export async function getFinishedGood(id: string) {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("finished_goods")
     .select("id, name, unit, quantity_in_stock, selling_price, cost_per_unit")
@@ -11,6 +12,7 @@ export async function getFinishedGood(id: string) {
 }
 
 export async function getFinishedGoods() {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("finished_goods")
     .select("id, name, unit")
@@ -20,6 +22,7 @@ export async function getFinishedGoods() {
 }
 
 export async function addStock(id: string, quantity: number, costPerUnit: number) {
+  const supabase = await createClient();
   const { error } = await supabase
     .from("finished_goods")
     .update({

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { deleteBOM } from "@/lib/actions/bill-of-materials";
 import { DeleteButton } from "@/components/delete-button";
 import type { BillOfMaterial, BillOfMaterialItem, RawMaterial, FinishedGood } from "@/lib/types";
@@ -8,6 +8,7 @@ import type { BillOfMaterial, BillOfMaterialItem, RawMaterial, FinishedGood } fr
 export default async function BOMDetailPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
 
+  const supabase = await createClient();
   const { data: bom } = await supabase
     .from("bill_of_materials")
     .select("*, bill_of_materials_items(*)")

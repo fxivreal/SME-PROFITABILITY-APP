@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export type CreateBatchData = {
   batch_number: string;
@@ -16,6 +16,7 @@ export type BatchFilters = {
 };
 
 export async function getNextBatchNumber(): Promise<string> {
+  const supabase = await createClient();
   const { count, error } = await supabase
     .from("production_batches")
     .select("*", { count: "exact", head: true });
@@ -28,6 +29,7 @@ export async function getNextBatchNumber(): Promise<string> {
 }
 
 export async function insertBatch(data: CreateBatchData) {
+  const supabase = await createClient();
   const { data: batch, error } = await supabase
     .from("production_batches")
     .insert({
@@ -52,6 +54,7 @@ export async function insertBatchMaterials(
   batchId: string,
   materials: { raw_material_id: string; quantity_used: number }[],
 ) {
+  const supabase = await createClient();
   const items = materials.map((m) => ({
     batch_id: batchId,
     raw_material_id: m.raw_material_id,
@@ -66,11 +69,13 @@ export async function insertBatchMaterials(
 }
 
 export async function deleteBatch(id: string) {
+  const supabase = await createClient();
   const { error } = await supabase.from("production_batches").delete().eq("id", id);
   if (error) throw new Error(error.message);
 }
 
 export async function completeBuildViaRPC(batchId: string) {
+  const supabase = await createClient();
   const { data, error } = await supabase.rpc("complete_build", {
     p_batch_id: batchId,
   });
@@ -89,6 +94,7 @@ export async function completeBuildViaRPC(batchId: string) {
 }
 
 export async function getBatches(filters?: BatchFilters) {
+  const supabase = await createClient();
   let query = supabase
     .from("production_batches")
     .select("*, finished_goods!finished_good_id(name), bill_of_materials!bom_id(name)")

@@ -1,6 +1,7 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 
 export async function getBOMWithItems(id: string) {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("bill_of_materials")
     .select("*, bill_of_materials_items(*)")
@@ -11,6 +12,7 @@ export async function getBOMWithItems(id: string) {
 }
 
 export async function getActiveBOMsWithItems() {
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("bill_of_materials")
     .select("*, bill_of_materials_items(raw_material_id, quantity_required)")

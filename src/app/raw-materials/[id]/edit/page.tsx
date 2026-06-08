@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { updateRawMaterial } from "@/lib/actions/raw-materials";
 import { RawMaterialForm } from "@/components/raw-material-form";
 import type { RawMaterial } from "@/lib/types";
@@ -11,6 +11,7 @@ type Props = {
 export default async function EditRawMaterialPage({ params }: Props) {
   const { id } = await params;
 
+  const supabase = await createClient();
   const { data: rawMaterial } = await supabase
     .from("raw_materials")
     .select("*")

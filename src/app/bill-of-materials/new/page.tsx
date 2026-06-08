@@ -1,9 +1,10 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { createBOM } from "@/lib/actions/bill-of-materials";
 import { BOMForm } from "@/components/bom-form";
 import type { RawMaterial } from "@/lib/types";
 
 export default async function NewBOMPage() {
+  const supabase = await createClient();
   const { data: rawMaterials } = await supabase
     .from("raw_materials")
     .select("id, name, unit")

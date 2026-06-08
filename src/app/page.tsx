@@ -1,7 +1,8 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import type { FinishedGood, Sale } from "@/lib/types";
 
 export default async function DashboardPage() {
+  const supabase = await createClient();
   const [salesResult, fgResult] = await Promise.all([
     supabase.from("sales").select("product_id, quantity_sold, selling_price"),
     supabase.from("finished_goods").select("id, name, unit, selling_price, cost_per_unit, quantity_in_stock").order("name"),
@@ -65,22 +66,22 @@ export default async function DashboardPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead>
                 <tr className="text-left text-sm font-medium text-gray-500">
-                  <th className="py-3 pr-6">Product</th>
-                  <th className="py-3 pr-6">Unit</th>
-                  <th className="py-3 pr-6">Units Sold</th>
-                  <th className="py-3 pr-6">Revenue</th>
-                  <th className="py-3 pr-6">COGS</th>
+                  <th className="py-3 pr-3 sm:pr-6">Product</th>
+                  <th className="py-3 pr-3 sm:pr-6">Unit</th>
+                  <th className="py-3 pr-3 sm:pr-6">Units Sold</th>
+                  <th className="py-3 pr-3 sm:pr-6">Revenue</th>
+                  <th className="py-3 pr-3 sm:pr-6">COGS</th>
                   <th className="py-3">Gross Profit</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 text-sm text-gray-700">
                 {productRows.map((r) => (
                   <tr key={r.id}>
-                    <td className="py-3 pr-6 font-medium text-gray-900">{r.name}</td>
-                    <td className="py-3 pr-6">{r.unit}</td>
-                    <td className="py-3 pr-6">{r.unitsSold.toFixed(2)}</td>
-                    <td className="py-3 pr-6">{naira(r.revenue)}</td>
-                    <td className="py-3 pr-6">{naira(r.cogs)}</td>
+                    <td className="py-3 pr-3 sm:pr-6 font-medium text-gray-900">{r.name}</td>
+                    <td className="py-3 pr-3 sm:pr-6">{r.unit}</td>
+                    <td className="py-3 pr-3 sm:pr-6">{r.unitsSold.toFixed(2)}</td>
+                    <td className="py-3 pr-3 sm:pr-6">{naira(r.revenue)}</td>
+                    <td className="py-3 pr-3 sm:pr-6">{naira(r.cogs)}</td>
                     <td className={`py-3 font-medium ${r.grossProfit >= 0 ? "text-green-600" : "text-red-600"}`}>
                       {naira(r.grossProfit)}
                     </td>

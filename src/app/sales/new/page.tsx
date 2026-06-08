@@ -1,9 +1,10 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { createSale } from "@/lib/actions/sales";
 import { SaleForm } from "@/components/sale-form";
 import type { FinishedGood } from "@/lib/types";
 
 export default async function NewSalePage() {
+  const supabase = await createClient();
   const { data: products } = await supabase
     .from("finished_goods")
     .select("id, name, selling_price")
