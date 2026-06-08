@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase";
+import { createClient, getCompanyId } from "@/lib/supabase";
 
 export type BOMFormState = {
   errors?: {
@@ -57,9 +57,11 @@ export async function createBOM(
   }
 
   const supabase = await createClient();
+  const company_id = await getCompanyId();
   const { data: fg, error: fgError } = await supabase
     .from("finished_goods")
     .insert({
+      company_id,
       name: fgName.trim(),
       unit: fgUnit,
       selling_price: parseFloat(fgSellingPrice),
@@ -73,7 +75,7 @@ export async function createBOM(
 
   const { data: bom, error: bomError } = await supabase
     .from("bill_of_materials")
-    .insert({ name: fgName.trim(), finished_good_id: fg.id })
+    .insert({ company_id, name: fgName.trim(), finished_good_id: fg.id })
     .select()
     .single();
 
@@ -83,6 +85,7 @@ export async function createBOM(
   }
 
   const bomItems = items.map((item) => ({
+    company_id,
     bom_id: bom.id,
     raw_material_id: item.raw_material_id,
     quantity_required: item.quantity_required,
@@ -133,9 +136,11 @@ export async function updateBOM(
   }
 
   const supabase = await createClient();
+  const company_id = await getCompanyId();
   await supabase.from("bill_of_materials_items").delete().eq("bom_id", id);
 
   const bomItems = items.map((item) => ({
+    company_id,
     bom_id: id,
     raw_material_id: item.raw_material_id,
     quantity_required: item.quantity_required,

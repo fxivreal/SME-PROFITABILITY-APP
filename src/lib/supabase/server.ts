@@ -22,3 +22,18 @@ export async function createClient() {
     },
   });
 }
+
+export async function getCompanyId(): Promise<string> {
+  const supabase = await createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) throw new Error("Not authenticated");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("company_id")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile?.company_id) throw new Error("No company found for user");
+  return profile.company_id;
+}

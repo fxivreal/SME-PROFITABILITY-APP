@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase";
+import { createClient, getCompanyId } from "@/lib/supabase";
 
 export type RecordSaleData = {
   product_id: string;
@@ -25,7 +25,9 @@ export async function recordSale(data: RecordSaleData) {
     );
   }
 
+  const company_id = await getCompanyId();
   const { error: insertError } = await supabase.from("sales").insert({
+    company_id,
     product_id: data.product_id,
     quantity_sold: data.quantity_sold,
     selling_price: data.selling_price,

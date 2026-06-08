@@ -1,1 +1,1 @@
-export { createClient } from "./supabase/server";
+export { createClient, getCompanyId } from "./supabase/server";
